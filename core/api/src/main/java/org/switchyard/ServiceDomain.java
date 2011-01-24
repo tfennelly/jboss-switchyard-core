@@ -79,20 +79,20 @@ public interface ServiceDomain {
      * unregister when required
      */
     Service registerService(QName serviceName, ExchangeHandler handler);
-    
+
     /**
-    * Register a service with the domain.
-    * @param serviceName the name of the service
-    * @param handler the handler to use to process exchanges directed at this
-    * service
-    * @param metadata service interface details
-    * @return a reference to the registered service that can be used to
-    * unregister when required
-    */
+     * Register a service with the domain.
+     * @param serviceName the name of the service
+     * @param handler the handler to use to process exchanges directed at this
+     * service
+     * @param metadata service interface details
+     * @return a reference to the registered service that can be used to
+     * unregister when required
+     */
     Service registerService(QName serviceName,
             ExchangeHandler handler,
             ServiceInterface metadata);
-    
+
     /**
      * Returns a references to the transformer registry for this domain.
      * @return transformer registry instance

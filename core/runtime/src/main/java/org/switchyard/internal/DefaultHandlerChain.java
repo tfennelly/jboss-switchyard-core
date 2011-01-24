@@ -26,11 +26,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.switchyard.Context;
 import org.switchyard.Exchange;
 import org.switchyard.ExchangeHandler;
 import org.switchyard.ExchangeState;
 import org.switchyard.HandlerChain;
 import org.switchyard.HandlerException;
+import org.switchyard.internal.handlers.TransformHandler;
+import org.switchyard.internal.handlers.TransformSequence;
+import org.switchyard.message.DefaultMessage;
 
 /**
  * Default handler chain.
@@ -102,8 +106,20 @@ public class DefaultHandlerChain implements HandlerChain {
         } catch (HandlerException handlerEx) {
             _logger.error(handlerEx);
 
-            // TODO : Convert the exception into something more portable ?
-            exchange.sendFault(new DefaultMessage().setContent(handlerEx));
+            Context newMsgContext = exchange.createContext();
+            String invokerFaultTypeName = TransformSequence.getFaultMessageType(exchange);
+            String exceptionTypeName = TransformHandler.toMessageType(handlerEx.getClass());
+
+            if(exceptionTypeName != null && invokerFaultTypeName != null) {
+                // Set up the type info on the message context so as the exception gets transformed
+                // appropriately for the invoker...
+                TransformSequence.
+                    from(exceptionTypeName).
+                    to(invokerFaultTypeName).
+                    associateWith(newMsgContext);
+            }
+
+            exchange.sendFault(new DefaultMessage().setContent(handlerEx), newMsgContext);
         }
     }
 

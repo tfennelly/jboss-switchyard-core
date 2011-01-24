@@ -40,6 +40,7 @@ import org.switchyard.MockHandler;
 import org.switchyard.Service;
 import org.switchyard.ServiceDomain;
 import org.switchyard.internal.ServiceDomains;
+import org.switchyard.internal.handlers.TransformSequence;
 import org.switchyard.internal.transform.BaseTransformer;
 import org.switchyard.transform.Transformer;
 
@@ -149,14 +150,14 @@ public class TransformationTest {
     @Test
     public void testTransformationByName() throws Exception {
         final QName serviceName = new QName("nameTransform");
-        final String fromName = "fromA";
-        final String toName = "toB";
+        final String inType = "fromA";
+        final String expectedDestType = "toB";
         final String input = "Hello";
         final String output = "Hello SwitchYard";
         
         // Define the transformation and register it
         Transformer<String, String> helloTransform = 
-                new BaseTransformer<String, String>(fromName, toName) {
+                new BaseTransformer<String, String>(inType, expectedDestType) {
             public String transform(String from) {
                 // transform the input date to the desired output string
                 return from + " SwitchYard";
@@ -177,10 +178,14 @@ public class TransformationTest {
         // at runtime
         Message msg = exchange.createMessage().setContent(input);
         Context msgCtx = msg.getContext();
-        msgCtx.setProperty("org.switchyard.message.name", fromName);
-        msgCtx.setProperty("org.switchyard.service.message.name", toName);
+        TransformSequence.
+                from(inType).
+                to(expectedDestType).
+                associateWith(msgCtx);
+
+        msg.setContent(input);
         exchange.send(msg);
-        
+
         // wait for message and verify transformation
         provider.waitForOKMessage();
         Assert.assertEquals(provider.getMessages().poll().getMessage().getContent(), output);

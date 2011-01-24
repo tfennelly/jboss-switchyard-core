@@ -22,7 +22,9 @@
 
 package org.switchyard.metadata;
 
+import org.switchyard.Exchange;
 import org.switchyard.ExchangePattern;
+import org.switchyard.Scope;
 
 /**
  * Representation of an operation on a ServiceInterface.  Each operation has:
@@ -38,6 +40,7 @@ import org.switchyard.ExchangePattern;
  * a Java interface would be Java method name to ServiceInterface operation name.
  */
 public interface ServiceOperation {
+
     /**
      * The exchange pattern for the operation.
      * @return exchange pattern
@@ -59,4 +62,41 @@ public interface ServiceOperation {
      * an output message (IN_ONLY).
      */
     String getOutputMessage();
+
+    /**
+     * Operation Name utility methods.
+     */
+    static final class Name {
+
+        /**
+         * Operation name Exchange Context key.
+         */
+        public static final String NAME = ServiceOperation.class.getName() + "#NAME";
+
+        /**
+         * Hidden constructor.
+         */
+        private Name() {
+        }
+
+        /**
+         * Set the target service operation name of the supplied {@link org.switchyard.Exchange} {@link org.switchyard.Context}.
+         *
+         * @param exchange The exchange instance.
+         * @param name     The target service operation name.
+         */
+        public static void set(Exchange exchange, String name) {
+            exchange.getContext(Scope.EXCHANGE).setProperty(NAME, name);
+        }
+
+        /**
+         * Get the target service operation name from the supplied {@link org.switchyard.Exchange} {@link org.switchyard.Context}.
+         *
+         * @param exchange The exchange instance.
+         * @return The operation name as specified on the {@link org.switchyard.Exchange} {@link org.switchyard.Context}.
+         */
+        public static String get(Exchange exchange) {
+            return (String) exchange.getContext(Scope.EXCHANGE).getProperty(NAME);
+        }
+    }
 }

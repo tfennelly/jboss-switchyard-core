@@ -24,12 +24,16 @@ package org.switchyard.internal;
 
 import javax.xml.namespace.QName;
 
+import org.switchyard.Exchange;
 import org.switchyard.HandlerChain;
+import org.switchyard.HandlerException;
 import org.switchyard.Service;
 import org.switchyard.ServiceDomain;
 import org.switchyard.metadata.ServiceInterface;
 import org.switchyard.spi.Endpoint;
 import org.switchyard.spi.ServiceRegistry;
+
+import java.util.List;
 
 /**
  * ServiceRegistration represents the registration of a service

@@ -108,17 +108,17 @@ public class DomainImpl implements ServiceDomain {
     public Service registerService(QName serviceName, ExchangeHandler handler) {
         return registerService(serviceName, handler, null);
     }
-    
+
     @Override
-    public Service registerService(QName serviceName, ExchangeHandler handler,
-            ServiceInterface metadata) {
+    public Service registerService(QName serviceName, ExchangeHandler handler, ServiceInterface metadata) {
         HandlerChain handlers = new DefaultHandlerChain();
         handlers.addLast("provider", handler);
         Endpoint ep = _endpointProvider.createEndpoint(handlers);
         // If no service interface is provided, we default to InOutService
         if (metadata != null) {
             return _registry.registerService(serviceName, metadata, ep, handlers, this);
-        } else {
+        }
+        else {
             return _registry.registerService(serviceName, new InOutService(), ep, handlers, this);
         }
     }

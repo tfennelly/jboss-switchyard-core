@@ -26,11 +26,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import org.switchyard.BaseHandler;
-import org.switchyard.Context;
 import org.switchyard.Exchange;
 import org.switchyard.HandlerException;
 import org.switchyard.Message;
 import org.switchyard.internal.transform.BaseTransformerRegistry;
+import org.switchyard.message.PayloadTypeName;
 import org.switchyard.transform.Transformer;
 import org.switchyard.transform.TransformerRegistry;
 
@@ -44,11 +44,6 @@ import org.switchyard.transform.TransformerRegistry;
  *
  */
 public class TransformHandler extends BaseHandler {
-
-    private static final String MESSAGE_NAME =
-        "org.switchyard.message.name";
-    private static final String SERVICE_MESSAGE_NAME =
-        "org.switchyard.service.message.name";
 
     private TransformerRegistry _registry;
 
@@ -82,28 +77,35 @@ public class TransformHandler extends BaseHandler {
      */
     @Override
     public void handleMessage(Exchange exchange) throws HandlerException {
-        Transformer t = locateTransform(exchange);
+        Transformer t = locateExplicitTransform(exchange);
 
-        if (t == null) {
-            // nothing to do
-            return;
+        if (t != null) {
+            Message msg = exchange.getMessage();
+            Object fromContent = msg.getContent();
+            Object toContent = t.transform(fromContent);
+            msg.setContent(toContent);
+        } else {
+            // Transformer instance not set explicitly on the Message.
+            // A TransformSequence may also be set.  Apply that if it's there...
+            TransformSequence.apply(exchange, _registry);
         }
-
-        Message msg = exchange.getMessage();
-        Object fromContent = msg.getContent();
-        Object toContent = t.transform(fromContent);
-        msg.setContent(toContent);
     }
 
+    @Override
+    public void handleFault(Exchange exchange) {
+        // Apply transforms to the fault...
+        TransformSequence.apply(exchange, _registry);
+    }
+
+    // TODO: (TF) Do we like this??  Not sure I do.
     /**
      * Locate a transformer instance to perform transformation.  The following
      * sources are searched in order: <br>
      * 1) A transformer set in the message context <br>
      * 2) A transformer set in the exchange context <br>
-     * 3) A transformer found through a registry search <br>
      * @param exchange exchange
      */
-    private Transformer locateTransform(Exchange exchange) {
+    private Transformer locateExplicitTransform(Exchange exchange) {
 
         Transformer transform = null;
 
@@ -115,16 +117,28 @@ public class TransformHandler extends BaseHandler {
         } else if (exchange.getContext().hasProperty(Transformer.class.getName())) {
             transform = (Transformer)
                 exchange.getContext().getProperty(Transformer.class.getName());
-        // look to see if we can find it in the transformer registry
-        } else {
-            Context msgCtx = exchange.getMessage().getContext();
-            String fromName = (String) msgCtx.getProperty(MESSAGE_NAME);
-            // temp hack - toName should actually come from the Service reference
-            String toName = (String) msgCtx.getProperty(SERVICE_MESSAGE_NAME);
-            transform = _registry.getTransformer(fromName, toName);
         }
 
         return transform;
+    }
+
+    /**
+     * Convert the supplied java type to a payload type name.
+     * <p/>
+     * Checks for a {@link PayloadTypeName} on the type.  If not found,
+     * the type name is derived from the Java Class name.
+     *
+     * @param javaType The Java type.
+     * @return The payload type.
+     */
+    public static String toMessageType(Class<?> javaType) {
+        PayloadTypeName payloadType = javaType.getAnnotation(PayloadTypeName.class);
+
+        if(payloadType != null) {
+            return payloadType.value();
+        } else {
+            return "java:/" + javaType.getName();
+        }
     }
 }
 

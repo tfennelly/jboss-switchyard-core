@@ -165,6 +165,10 @@ public final class ServiceDomains {
         return _domains.get(domainName);
     }
 
+    public static ServiceRegistry getRegistry() {
+        return _registry;
+    }
+
     /**
      * Get the names of the _domains that exist.
      * @return domain names

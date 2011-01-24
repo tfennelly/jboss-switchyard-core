@@ -94,4 +94,8 @@ public class InOnlyOperation implements ServiceOperation {
         return null;
     }
 
+    @Override
+    public String toString() {
+        return _operationName + "{IN_ONLY}";
+    }
 }

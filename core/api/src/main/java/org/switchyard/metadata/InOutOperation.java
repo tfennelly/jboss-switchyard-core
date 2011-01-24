@@ -101,4 +101,9 @@ public class InOutOperation implements ServiceOperation {
     public String getOutputMessage() {
         return _outputName;
     }
+
+    @Override
+    public String toString() {
+        return _operationName + "{IN_OUT}";
+    }
 }

@@ -32,6 +32,7 @@ import org.switchyard.ExchangeState;
 import org.switchyard.HandlerChain;
 import org.switchyard.Message;
 import org.switchyard.Service;
+import org.switchyard.internal.handlers.TransformSequence;
 import org.switchyard.spi.Endpoint;
 
 /**
@@ -111,6 +112,11 @@ public class ExchangeImpl implements Exchange {
             _phase = ExchangePhase.IN;
         } else if (_phase.equals(ExchangePhase.IN)) {
             _phase = ExchangePhase.OUT;
+            // It's an OUT phase send ... swap in the TransformSequence for the OUT phase...
+            TransformSequence outSequence = TransformSequence.getOutSequence(this);
+            if(outSequence != null) {
+                outSequence.associateWith(message.getContext());
+            }
         } else {
             throw new IllegalStateException(
                     "Send message not allowed for exchange in phase " + _phase);
