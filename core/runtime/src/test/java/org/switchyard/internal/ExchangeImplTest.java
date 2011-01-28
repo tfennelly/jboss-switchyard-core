@@ -106,9 +106,9 @@ public class ExchangeImplTest {
                         inPropVal);
                 
                 try {
-                    Context outCtx = exchange.createContext();
-                    outCtx.setProperty(sharedPropName, outPropVal);
-                    exchange.send(MessageBuilder.newInstance().buildMessage(), outCtx);
+                    Message message = exchange.buildMessage(MessageBuilder.newInstance());
+                    exchange.getContext(Scope.MESSAGE).setProperty(sharedPropName, outPropVal);
+                    exchange.send(message);
                 }
                 catch (Exception ex) {
                     Assert.fail(ex.toString());
@@ -131,11 +131,12 @@ public class ExchangeImplTest {
         Service service = _domain.registerService(serviceName, provider);
         Exchange exchange = _domain.createExchange(
                 service, ExchangePattern.IN_OUT, consumer);
-        Message inMsg = MessageBuilder.newInstance().buildMessage();
-        Context inCtx = exchange.createContext();
+
+        Message inMsg = exchange.buildMessage(MessageBuilder.newInstance());
+        Context inCtx = exchange.getContext(Scope.MESSAGE);
         inCtx.setProperty(sharedPropName, inPropVal);
         inCtx.setProperty(inPropName, inPropVal);
-        exchange.send(inMsg, inCtx);
+        exchange.send(inMsg);
         
         // clean up
         service.unregister();
@@ -161,7 +162,7 @@ public class ExchangeImplTest {
                 		exchange.getMessage().getContent(), 
                         inMsgContent);
                 
-                Message outMsg = MessageBuilder.newInstance().buildMessage();
+                Message outMsg = exchange.buildMessage(MessageBuilder.newInstance());
                 outMsg.setContent(outMsgContent);
                 try {
                 	exchange.send(outMsg);
@@ -183,7 +184,7 @@ public class ExchangeImplTest {
         Service service = _domain.registerService(serviceName, provider);
         Exchange exchange = _domain.createExchange(
                 service, ExchangePattern.IN_OUT, consumer);
-        Message inMsg = MessageBuilder.newInstance().buildMessage();
+        Message inMsg = exchange.buildMessage(MessageBuilder.newInstance());
         inMsg.setContent(inMsgContent);
         exchange.send(inMsg);
 
@@ -204,7 +205,7 @@ public class ExchangeImplTest {
         MockHandler consumer = new MockHandler();
         Exchange exchange = _domain.createExchange(
                 service, ExchangePattern.IN_OUT, consumer);
-        exchange.send(MessageBuilder.newInstance().buildMessage());
+        exchange.send(exchange.buildMessage(MessageBuilder.newInstance()));
 
         // wait, since this is async
         provider.waitForOKMessage();

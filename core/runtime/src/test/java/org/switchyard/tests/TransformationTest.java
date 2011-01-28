@@ -92,12 +92,12 @@ public class TransformationTest {
         // Create the exchange, add the transformer, and invoke the service
         Exchange exchange = _domain.createExchange(
                 service, ExchangePattern.IN_ONLY);
-        Context msgCtx = exchange.createContext();
+        Message msg = exchange.buildMessage(MessageBuilder.newInstance());
+        Context msgCtx = exchange.getContext(Scope.MESSAGE);
         msgCtx.setProperty(Transformer.class.getName(), dateToString);
-        
-        Message msg = MessageBuilder.newInstance().buildMessage();
+
         msg.setContent(input);
-        exchange.send(msg, msgCtx);
+        exchange.send(msg);
         
         // wait for message and verify transformation
         provider.waitForOKMessage();
@@ -136,7 +136,7 @@ public class TransformationTest {
                 service, ExchangePattern.IN_ONLY);
         exchange.getContext().setProperty(Transformer.class.getName(), dateToString);
         
-        Message msg = MessageBuilder.newInstance().buildMessage();
+        Message msg = exchange.buildMessage(MessageBuilder.newInstance());
         msg.setContent(input);
         exchange.send(msg);
         
@@ -174,17 +174,17 @@ public class TransformationTest {
         // Create the exchange and invoke the service
         Exchange exchange = _domain.createExchange(
                 service, ExchangePattern.IN_ONLY);
-        
+        Message msg = exchange.buildMessage(MessageBuilder.newInstance());
+
         // Set the from and to message names.  NOTE: setting to the to message
         // name will not be necessary once the service definition is available
         // at runtime
         Context msgCtx = exchange.getContext(Scope.MESSAGE);
         msgCtx.setProperty("org.switchyard.message.name", fromName);
         msgCtx.setProperty("org.switchyard.service.message.name", toName);
-        
-        Message msg = MessageBuilder.newInstance().buildMessage();
+
         msg.setContent(input);
-        exchange.send(msg, msgCtx);
+        exchange.send(msg);
         
         // wait for message and verify transformation
         provider.waitForOKMessage();

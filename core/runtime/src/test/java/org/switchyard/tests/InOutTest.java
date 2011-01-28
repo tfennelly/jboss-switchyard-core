@@ -58,7 +58,7 @@ public class InOutTest {
         MockHandler consumer = new MockHandler();
         Exchange exchange = _domain.createExchange(
                 service, ExchangePattern.IN_OUT, consumer);
-        exchange.send(MessageBuilder.newInstance().buildMessage());
+        exchange.send(exchange.buildMessage(MessageBuilder.newInstance()));
         
         // wait, since this is async
         provider.waitForOKMessage();
@@ -77,7 +77,7 @@ public class InOutTest {
         MockHandler consumer = new MockHandler();
         Exchange exchange = _domain.createExchange(
                 service, ExchangePattern.IN_OUT, consumer);
-        exchange.send(MessageBuilder.newInstance().buildMessage());
+        exchange.send(exchange.buildMessage(MessageBuilder.newInstance()));
         
         // wait, since this is async
         provider.waitForOKMessage();
