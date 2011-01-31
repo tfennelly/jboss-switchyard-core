@@ -43,14 +43,14 @@ public interface ExchangeContract {
     ServiceOperation getServiceOperation();
 
     /**
-     * Get the set of valid response types accepted by the exchange invoker.
-     * @return The set of valid response types accepted by the exchange invoker.
+     * Get the response type accepted by the exchange invoker.
+     * @return The response type accepted by the exchange invoker.
      */
-    Set<String> getAcceptedResponseTypes();
+    String getAcceptedResponseType();
 
     /**
-     * Get the set of valid fault types accepted by the exchange invoker.
-     * @return The set of valid fault types accepted by the exchange invoker.
+     * Get the fault type accepted by the exchange invoker.
+     * @return The fault type accepted by the exchange invoker.
      */
-    Set<String> getAcceptedFaultTypes();
+    String getAcceptedFaultType();
 }
