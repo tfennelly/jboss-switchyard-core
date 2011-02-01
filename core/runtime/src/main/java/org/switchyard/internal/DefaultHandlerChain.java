@@ -32,9 +32,9 @@ import org.switchyard.ExchangeHandler;
 import org.switchyard.ExchangeState;
 import org.switchyard.HandlerChain;
 import org.switchyard.HandlerException;
+import org.switchyard.Message;
 import org.switchyard.internal.handlers.TransformHandler;
 import org.switchyard.internal.handlers.TransformSequence;
-import org.switchyard.message.DefaultMessage;
 
 /**
  * Default handler chain.
@@ -106,7 +106,7 @@ public class DefaultHandlerChain implements HandlerChain {
         } catch (HandlerException handlerEx) {
             _logger.error(handlerEx);
 
-            Context newMsgContext = exchange.createContext();
+            Message faultMessage = exchange.createMessage().setContent(handlerEx);
             String invokerFaultTypeName = TransformSequence.getFaultMessageType(exchange);
             String exceptionTypeName = TransformHandler.toMessageType(handlerEx.getClass());
 
@@ -116,10 +116,10 @@ public class DefaultHandlerChain implements HandlerChain {
                 TransformSequence.
                     from(exceptionTypeName).
                     to(invokerFaultTypeName).
-                    associateWith(newMsgContext);
+                    associateWith(faultMessage.getContext());
             }
 
-            exchange.sendFault(new DefaultMessage().setContent(handlerEx), newMsgContext);
+            exchange.sendFault(faultMessage);
         }
     }
 

@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 import org.switchyard.Context;
 import org.switchyard.Exchange;
 import org.switchyard.Message;
-import org.switchyard.Scope;
 import org.switchyard.transform.Transformer;
 import org.switchyard.transform.TransformerRegistry;
 
@@ -261,7 +260,7 @@ public class TransformSequence implements Serializable {
     }
 
     private static TransformSequence get(final Exchange exchange) {
-        Context context = exchange.getContext(Scope.MESSAGE);
+        Context context = exchange.getMessage().getContext();
         return (TransformSequence) context.getProperty(TransformSequence.class.getName());
     }
 }

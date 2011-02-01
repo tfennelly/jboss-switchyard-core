@@ -24,7 +24,6 @@ package org.switchyard.metadata;
 
 import org.switchyard.Exchange;
 import org.switchyard.ExchangePattern;
-import org.switchyard.Scope;
 
 /**
  * Representation of an operation on a ServiceInterface.  Each operation has:
@@ -86,7 +85,7 @@ public interface ServiceOperation {
          * @param name     The target service operation name.
          */
         public static void set(Exchange exchange, String name) {
-            exchange.getContext(Scope.EXCHANGE).setProperty(NAME, name);
+            exchange.getContext().setProperty(NAME, name);
         }
 
         /**
@@ -96,7 +95,7 @@ public interface ServiceOperation {
          * @return The operation name as specified on the {@link org.switchyard.Exchange} {@link org.switchyard.Context}.
          */
         public static String get(Exchange exchange) {
-            return (String) exchange.getContext(Scope.EXCHANGE).getProperty(NAME);
+            return (String) exchange.getContext().getProperty(NAME);
         }
     }
 }
