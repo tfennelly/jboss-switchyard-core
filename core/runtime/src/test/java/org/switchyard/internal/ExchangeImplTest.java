@@ -37,6 +37,7 @@ import org.switchyard.Message;
 import org.switchyard.MockHandler;
 import org.switchyard.Service;
 import org.switchyard.ServiceDomain;
+import org.switchyard.contract.ExchangeContract;
 
 /**
  *  Unit tests for the ExchangeImpl class.
@@ -52,7 +53,7 @@ public class ExchangeImplTest {
     
     @Test
     public void testSendFaultOnNewExchange() {
-        Exchange exchange = new ExchangeImpl(null, ExchangePattern.IN_OUT, null);
+        Exchange exchange = new ExchangeImpl(null, ExchangeContract.IN_OUT_DEFAULT, null);
         try {
             exchange.sendFault(exchange.createMessage());
             Assert.fail("Sending a fault on a new exchange is not allowed");
@@ -63,7 +64,7 @@ public class ExchangeImplTest {
     
     @Test
     public void testPhaseIsNullOnNewExchange() {
-        Exchange exchange = new ExchangeImpl(null, ExchangePattern.IN_OUT, null);
+        Exchange exchange = new ExchangeImpl(null, ExchangeContract.IN_OUT_DEFAULT, null);
         Assert.assertNull(exchange.getPhase());
     }
     
@@ -71,7 +72,7 @@ public class ExchangeImplTest {
     public void testPhaseIsInAfterInputMessage() {
         Service service = _domain.registerService(
                 new QName("InPhase"), new MockHandler());
-        Exchange exchange = _domain.createExchange(service, ExchangePattern.IN_ONLY);
+        Exchange exchange = _domain.createExchange(service, ExchangeContract.IN_ONLY_DEFAULT);
         exchange.send(exchange.createMessage());
         Assert.assertEquals(ExchangePhase.IN, exchange.getPhase());
     }
@@ -82,7 +83,7 @@ public class ExchangeImplTest {
                 new QName("OutPhase"), new MockHandler().forwardInToOut());
         MockHandler replyHandler = new MockHandler();
         Exchange exchange = _domain.createExchange(
-                service, ExchangePattern.IN_OUT, replyHandler);
+                service, ExchangeContract.IN_OUT_DEFAULT, replyHandler);
         exchange.send(exchange.createMessage());
         replyHandler.waitForOKMessage();
         Assert.assertEquals(ExchangePhase.OUT, exchange.getPhase());
@@ -94,7 +95,7 @@ public class ExchangeImplTest {
                 new QName("FaultPhase"), new MockHandler().forwardInToFault());
         MockHandler replyHandler = new MockHandler();
         Exchange exchange = _domain.createExchange(
-                service, ExchangePattern.IN_OUT, replyHandler);
+                service, ExchangeContract.IN_OUT_DEFAULT, replyHandler);
         exchange.send(exchange.createMessage());
         replyHandler.waitForFaultMessage();
         Assert.assertEquals(ExchangePhase.OUT, exchange.getPhase());
@@ -140,7 +141,7 @@ public class ExchangeImplTest {
         
         Service service = _domain.registerService(serviceName, provider);
         Exchange exchange = _domain.createExchange(
-                service, ExchangePattern.IN_OUT, consumer);
+                service, ExchangeContract.IN_OUT_DEFAULT, consumer);
         Message inMsg = exchange.createMessage();
         inMsg.setContent(inMsgContent);
         exchange.send(inMsg);
@@ -161,7 +162,7 @@ public class ExchangeImplTest {
         // Consume the service
         MockHandler consumer = new MockHandler();
         Exchange exchange = _domain.createExchange(
-                service, ExchangePattern.IN_OUT, consumer);
+                service, ExchangeContract.IN_OUT_DEFAULT, consumer);
         exchange.send(exchange.createMessage());
 
         // wait, since this is async

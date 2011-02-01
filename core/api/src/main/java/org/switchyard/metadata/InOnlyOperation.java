@@ -30,11 +30,6 @@ import org.switchyard.ExchangePattern;
  */
 public class InOnlyOperation implements ServiceOperation {
     
-    /**
-     *  Default name of the input message.
-     */
-    public static final String INPUT_MESSAGE = "in";
-    
     // The operation name
     private String _operationName;
     // The input message name
@@ -45,7 +40,7 @@ public class InOnlyOperation implements ServiceOperation {
      * @param operationName the name of the operation
      */
     public InOnlyOperation(String operationName) {
-        this(operationName, INPUT_MESSAGE);
+        this(operationName, null);
     }
     
     /**

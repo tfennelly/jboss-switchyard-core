@@ -54,18 +54,6 @@ public class TransformSequence implements Serializable {
      * Logger.
      */
     private static final Logger _logger = Logger.getLogger(TransformSequence.class);
-    /**
-     * Exchange context key used for caching the TransformSequence for the OUT phase of an
-     * {@link org.switchyard.ExchangePattern IN_OUT} exchange.
-     */
-    public static final String OUT_MESSAGE_TRANSFORM_SEQUENCE = "org.switchyard.service.out.xform.sequence";
-    /**
-     * Exchange context key used for caching the expected FAULT response message data.
-     * <p/>
-     * This type value is use for setting up the {@link org.switchyard.internal.handlers.TransformSequence}
-     * on a fault Message instance.
-     */
-    public static final String FAULT_MESSAGE_TYPE_EXPECTED_BY_INVOKER = "org.switchyard.service.type.expected.invoker.fault";
 
     /**
      * Transform Sequence.
@@ -199,57 +187,6 @@ public class TransformSequence implements Serializable {
                 break;
             }
         }
-    }
-
-    /**
-     * Set the TransformSequence for the OUT phase of the supplied exchange.
-     * <p/>
-     * This sequence is swapped in for the OUT phase.
-     *
-     * @param exchange The Exchange instance.
-     * @param sequence The OUT phase transform sequence.
-     * @return The supplied Exchange instance.
-     */
-    public static Exchange cacheOutSequence(final Exchange exchange, final TransformSequence sequence) {
-        exchange.getContext().setProperty(OUT_MESSAGE_TRANSFORM_SEQUENCE, sequence);
-        return exchange;
-    }
-
-    /**
-     * Get the TransformSequence for the OUT phase of the supplied exchange.
-     * <p/>
-     * This sequence is swapped in for the OUT phase.
-     *
-     * @param exchange The Exchange instance.
-     * @return The TransformSequence.
-     */
-    public static TransformSequence getOutSequence(final Exchange exchange) {
-        return (TransformSequence) exchange.getContext().getProperty(OUT_MESSAGE_TRANSFORM_SEQUENCE);
-    }
-
-    /**
-     * Cache the {@link org.switchyard.ExchangeState#FAULT} Message payload type expected by the exchange invoker.
-     * <p/>
-     * Used if there's a fault.
-     *
-     * @param exchange The Exchange instance.
-     * @param type     The type.
-     * @return The supplied Exchange instance.
-     */
-    public static Exchange cacheFaultMessageType(final Exchange exchange, final String type) {
-        exchange.getContext().setProperty(FAULT_MESSAGE_TYPE_EXPECTED_BY_INVOKER, type);
-        return exchange;
-    }
-
-    /**
-     * Get the {@link org.switchyard.ExchangeState#FAULT} Message payload type expected by the exchange invoker.
-     *
-     * @param exchange The Exchange instance.
-     * @return The {@link org.switchyard.ExchangeState#FAULT} Message payload type expected by the exchange invoker,
-     *         or null if not specified.
-     */
-    public static String getFaultMessageType(final Exchange exchange) {
-        return (String) exchange.getContext().getProperty(FAULT_MESSAGE_TYPE_EXPECTED_BY_INVOKER);
     }
 
     private void add(final String typeName) {

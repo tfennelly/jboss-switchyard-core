@@ -30,15 +30,6 @@ import org.switchyard.ExchangePattern;
  */
 public class InOutOperation implements ServiceOperation {
     
-    /**
-     * Default name of the input message.
-     */
-    public static final String INPUT_MESSAGE = "in";
-    /**
-     *  Default name of the output message.
-     */
-    public static final String OUTPUT_MESSAGE = "out";
-
     // operation name
     private String _operationName;
     // input message name
@@ -51,7 +42,7 @@ public class InOutOperation implements ServiceOperation {
      * @param operationName the name of the operation
      */
     public InOutOperation(String operationName) {
-        this(operationName, INPUT_MESSAGE, OUTPUT_MESSAGE);
+        this(operationName, null, null);
     }
     
     /**

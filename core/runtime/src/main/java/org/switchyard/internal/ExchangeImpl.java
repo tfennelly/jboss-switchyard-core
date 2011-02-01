@@ -32,6 +32,7 @@ import org.switchyard.ExchangeState;
 import org.switchyard.HandlerChain;
 import org.switchyard.Message;
 import org.switchyard.Service;
+import org.switchyard.contract.ExchangeContract;
 import org.switchyard.internal.handlers.TransformSequence;
 import org.switchyard.spi.Endpoint;
 
@@ -54,7 +55,7 @@ public class ExchangeImpl implements Exchange {
     public static final String FAULT_MSG = "fault";
 
     private final String            _exchangeId;
-    private final ExchangePattern   _pattern;
+    private final ExchangeContract  _contract;
     private ExchangePhase           _phase;
     private final Service           _service;
     private Message                 _message;
@@ -67,12 +68,12 @@ public class ExchangeImpl implements Exchange {
     /**
      * Constructor.
      * @param service service
-     * @param pattern exchange pattern
+     * @param contract exchange contract
      * @param handlers handlers
      */
-    ExchangeImpl(Service service, ExchangePattern pattern, HandlerChain handlers) {
+    public ExchangeImpl(Service service, ExchangeContract contract, HandlerChain handlers) {
         _service = service;
-        _pattern = pattern;
+        _contract = contract;
         _handlers = handlers;
         _exchangeId = UUID.randomUUID().toString();
         _context = new DefaultContext();
@@ -84,8 +85,8 @@ public class ExchangeImpl implements Exchange {
     }
 
     @Override
-    public ExchangePattern getPattern() {
-        return _pattern;
+    public ExchangeContract getContract() {
+        return _contract;
     }
 
     @Override
@@ -110,13 +111,10 @@ public class ExchangeImpl implements Exchange {
         // Set exchange phase
         if (_phase == null) {
             _phase = ExchangePhase.IN;
+            initInTransformSequence(message);
         } else if (_phase.equals(ExchangePhase.IN)) {
             _phase = ExchangePhase.OUT;
-            // It's an OUT phase send ... swap in the TransformSequence for the OUT phase...
-            TransformSequence outSequence = TransformSequence.getOutSequence(this);
-            if(outSequence != null) {
-                outSequence.associateWith(message.getContext());
-            }
+            initOutTransformSequence(message);
         } else {
             throw new IllegalStateException(
                     "Send message not allowed for exchange in phase " + _phase);
@@ -195,5 +193,29 @@ public class ExchangeImpl implements Exchange {
     @Override
     public ExchangePhase getPhase() {
         return _phase;
+    }
+
+    private void initInTransformSequence(Message message) {
+        String exchangeInputType = _contract.getInputType();
+        String serviceOperationInputType = _contract.getServiceOperation().getInputMessage();
+
+        if(exchangeInputType != null && serviceOperationInputType != null) {
+            TransformSequence.
+                    from(exchangeInputType).
+                    to(serviceOperationInputType).
+                    associateWith(message.getContext());
+        }
+    }
+
+    private void initOutTransformSequence(Message message) {
+        String serviceOperationOutputType = _contract.getServiceOperation().getOutputMessage();
+        String exchangeOutputType = _contract.getAcceptedOutputType();
+
+        if(serviceOperationOutputType != null && exchangeOutputType != null) {
+            TransformSequence.
+                    from(serviceOperationOutputType).
+                    to(exchangeOutputType).
+                    associateWith(message.getContext());
+        }
     }
 }

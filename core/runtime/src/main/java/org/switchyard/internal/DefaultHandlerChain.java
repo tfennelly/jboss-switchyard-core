@@ -107,19 +107,22 @@ public class DefaultHandlerChain implements HandlerChain {
             _logger.error(handlerEx);
 
             Message faultMessage = exchange.createMessage().setContent(handlerEx);
-            String invokerFaultTypeName = TransformSequence.getFaultMessageType(exchange);
-            String exceptionTypeName = TransformHandler.toMessageType(handlerEx.getClass());
-
-            if(exceptionTypeName != null && invokerFaultTypeName != null) {
-                // Set up the type info on the message context so as the exception gets transformed
-                // appropriately for the invoker...
-                TransformSequence.
-                    from(exceptionTypeName).
-                    to(invokerFaultTypeName).
-                    associateWith(faultMessage.getContext());
-            }
-
+            initFaultTransformsequence(exchange, handlerEx, faultMessage);
             exchange.sendFault(faultMessage);
+        }
+    }
+
+    private void initFaultTransformsequence(Exchange exchange, HandlerException handlerEx, Message faultMessage) {
+        String exceptionTypeName = TransformHandler.toMessageType(handlerEx.getClass());
+        String invokerFaultTypeName = exchange.getContract().getAcceptedFaultType();
+
+        if(exceptionTypeName != null && invokerFaultTypeName != null) {
+            // Set up the type info on the message context so as the exception gets transformed
+            // appropriately for the invoker...
+            TransformSequence.
+                from(exceptionTypeName).
+                to(invokerFaultTypeName).
+                associateWith(faultMessage.getContext());
         }
     }
 

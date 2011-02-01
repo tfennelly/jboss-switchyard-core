@@ -32,6 +32,7 @@ import org.switchyard.ExchangePattern;
 import org.switchyard.HandlerChain;
 import org.switchyard.Service;
 import org.switchyard.ServiceDomain;
+import org.switchyard.contract.ExchangeContract;
 import org.switchyard.internal.handlers.AddressingHandler;
 import org.switchyard.internal.handlers.DeliveryHandler;
 import org.switchyard.internal.handlers.TransformHandler;
@@ -79,20 +80,26 @@ public class DomainImpl implements ServiceDomain {
     }
 
     @Override
-    public Exchange createExchange(Service service, ExchangePattern pattern) {
-        return createExchange(service, pattern, null);
+    public Exchange createExchange(Service service, ExchangeContract contract) {
+        return createExchange(service, contract, null);
     }
 
 
 
     @Override
     public Exchange createExchange(
-            Service service, ExchangePattern pattern, ExchangeHandler handler) {
+            Service service, ExchangeContract contract, ExchangeHandler handler) {
+
+        // Check that the ExchangeContract has a ServiceOperation defined on it...
+        if(contract.getServiceOperation() == null) {
+            throw new IllegalArgumentException("Invalid 'contract' arg.  No ServiceOperation defined on the contract instance.");
+        }
+
         // setup the system handlers
         HandlerChain handlers = new DefaultHandlerChain();
         handlers.addLast("system.handlers", _systemHandlers);
         // create the exchange
-        ExchangeImpl exchange = new ExchangeImpl(service, pattern, handlers);
+        ExchangeImpl exchange = new ExchangeImpl(service, contract, handlers);
 
         if (handler != null) {
             // A response handler was specified, so setup a reply endpoint

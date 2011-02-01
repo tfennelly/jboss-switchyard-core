@@ -39,6 +39,7 @@ import org.switchyard.Message;
 import org.switchyard.MockHandler;
 import org.switchyard.Service;
 import org.switchyard.ServiceDomain;
+import org.switchyard.contract.ExchangeContract;
 import org.switchyard.internal.ServiceDomains;
 import org.switchyard.internal.handlers.TransformSequence;
 import org.switchyard.internal.transform.BaseTransformer;
@@ -90,7 +91,7 @@ public class TransformationTest {
         
         // Create the exchange, add the transformer, and invoke the service
         Exchange exchange = _domain.createExchange(
-                service, ExchangePattern.IN_ONLY);
+                service, ExchangeContract.IN_ONLY_DEFAULT);
         
         Message msg = exchange.createMessage();
         msg.getContext().setProperty(Transformer.class.getName(), dateToString);
@@ -131,7 +132,7 @@ public class TransformationTest {
         
         // Create the exchange, add the transformer, and invoke the service
         Exchange exchange = _domain.createExchange(
-                service, ExchangePattern.IN_ONLY);
+                service, ExchangeContract.IN_ONLY_DEFAULT);
         exchange.getContext().setProperty(Transformer.class.getName(), dateToString);
         
         Message msg = exchange.createMessage();
@@ -171,7 +172,7 @@ public class TransformationTest {
         
         // Create the exchange and invoke the service
         Exchange exchange = _domain.createExchange(
-                service, ExchangePattern.IN_ONLY);
+                service, ExchangeContract.IN_ONLY_DEFAULT);
         
         // Set the from and to message names.  NOTE: setting to the to message
         // name will not be necessary once the service definition is available

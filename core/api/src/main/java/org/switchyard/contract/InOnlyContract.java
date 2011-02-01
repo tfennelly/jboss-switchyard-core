@@ -20,37 +20,42 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.switchyard;
+package org.switchyard.contract;
 
+import org.switchyard.metadata.InOnlyOperation;
+import org.switchyard.metadata.ServiceInterface;
 import org.switchyard.metadata.ServiceOperation;
 
-import java.util.Set;
-
 /**
- * Exchange Contract.
- * <p/>
- * Two-way Exchange contract, detailing the requirments of both the invoker (in terms of
- * accepted response/fault types) and target {@link ServiceOperation} being invoked.
+ * Default/opaque {@link org.switchyard.ExchangePattern#IN_ONLY} exchange
+ * contract.
  *
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
-public interface ExchangeContract {
+class InOnlyContract implements ExchangeContract {
 
     /**
-     * Get the target service operation being invoked.
-     * @return The target service operation being invoked.
+     * Default operation.
      */
-    ServiceOperation getServiceOperation();
+    private static final InOnlyOperation _inOnlyOperation = new InOnlyOperation(ServiceInterface.DEFAULT_OPERATION);
 
-    /**
-     * Get the response type accepted by the exchange invoker.
-     * @return The response type accepted by the exchange invoker.
-     */
-    String getAcceptedResponseType();
+    @Override
+    public ServiceOperation getServiceOperation() {
+        return _inOnlyOperation;
+    }
 
-    /**
-     * Get the fault type accepted by the exchange invoker.
-     * @return The fault type accepted by the exchange invoker.
-     */
-    String getAcceptedFaultType();
+    @Override
+    public String getInputType() {
+        return null;
+    }
+
+    @Override
+    public String getAcceptedOutputType() {
+        return null;
+    }
+
+    @Override
+    public String getAcceptedFaultType() {
+        return null;
+    }
 }
