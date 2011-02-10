@@ -34,6 +34,8 @@
     <module>test/test-util</module>
     <module>core/runtime</module>
     <module>tools/maven/plugins/switchyard</module>
+    <module>deploy/base</module>
+    <module>deploy/cdi</module>
     <module>tools/maven/archetypes/application</module>
     <module>registry</module>
   </modules>
@@ -442,7 +444,16 @@
       </dependency>
       <dependency>
         <groupId>org.switchyard</groupId>
+<<<<<<< HEAD
         <artifactId>core-runtime</artifactId>
+=======
+        <artifactId>deploy</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.switchyard</groupId>
+        <artifactId>test-util</artifactId>
+>>>>>>> Created a new deployer module containing a base set of interfaces along with a core deployer implementation.  At present, the deployer is kicked off via a CDI extension.  The CDI deployer has been added as a separate module.
         <version>${project.version}</version>
       </dependency>
       <dependency>
