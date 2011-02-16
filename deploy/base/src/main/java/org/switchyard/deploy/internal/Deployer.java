@@ -34,10 +34,10 @@ import org.switchyard.ServiceDomain;
 import org.switchyard.config.model.ModelResource;
 import org.switchyard.config.model.composite.BindingModel;
 import org.switchyard.config.model.composite.ComponentModel;
+import org.switchyard.config.model.composite.ComponentReferenceModel;
+import org.switchyard.config.model.composite.ComponentServiceModel;
 import org.switchyard.config.model.composite.CompositeModel;
-import org.switchyard.config.model.composite.ExternalServiceModel;
-import org.switchyard.config.model.composite.InternalServiceModel;
-import org.switchyard.config.model.composite.ReferenceModel;
+import org.switchyard.config.model.composite.CompositeServiceModel;
 import org.switchyard.deploy.Activator;
 import org.switchyard.internal.DefaultEndpointProvider;
 import org.switchyard.internal.DefaultServiceRegistry;
@@ -151,7 +151,7 @@ public class Deployer {
             Activator activator = _componentActivators.get(
                     component.getImplementation().getType());
             // register a service for each one declared in the component
-            for (InternalServiceModel service : component.getServices()) {
+            for (ComponentServiceModel service : component.getServices()) {
                 LOG.info("Registering service " + service.getName() + 
                         " for component " + component.getImplementation().getType());
                 ExchangeHandler handler = activator.init(service.getQName(), service);
@@ -168,7 +168,7 @@ public class Deployer {
             Activator activator = _componentActivators.get(
                     component.getImplementation().getType());
             // register a service for each one declared in the component
-            for (ReferenceModel reference : component.getReferences()) {
+            for (ComponentReferenceModel reference : component.getReferences()) {
                 LOG.info("Registering reference " + reference.getName() + 
                         " for component " + component.getImplementation().getType());
                 Service service = _serviceDomain.getService(reference.getQName());
@@ -181,7 +181,7 @@ public class Deployer {
     private void deployServiceBindings() {
         LOG.info("Deploying service bindings ...");
         // activate bindings for each service
-        for (ExternalServiceModel service : _switchyardConfig.getServices()) {
+        for (CompositeServiceModel service : _switchyardConfig.getServices()) {
             for (BindingModel binding : service.getBindings()) {
                 LOG.info("Deploying binding " + binding.getType() + " for service " + service.getName());
                 Activator activator = _gatewayActivators.get(binding.getType());
