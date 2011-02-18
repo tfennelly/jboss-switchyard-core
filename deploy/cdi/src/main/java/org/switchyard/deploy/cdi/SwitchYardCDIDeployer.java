@@ -39,7 +39,7 @@ import org.switchyard.deploy.internal.Deployment;
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
 @ApplicationScoped
-public class SwitchYardCDIBootstrapper implements Extension {
+public class SwitchYardCDIDeployer implements Extension {
 
     private static final String DESCRIPTOR = "META-INF/switchyard.xml";
     private Deployment _deployment;
@@ -53,8 +53,8 @@ public class SwitchYardCDIBootstrapper implements Extension {
         InputStream swConfigStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(DESCRIPTOR);
 
         if (swConfigStream != null) {
-            _deployment = new Deployment();
-            _deployment.init(swConfigStream);
+            _deployment = new Deployment(swConfigStream);
+            _deployment.init();
         }
     }
 
