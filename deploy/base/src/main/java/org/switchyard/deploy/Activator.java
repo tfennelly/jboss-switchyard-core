@@ -24,10 +24,12 @@ import javax.xml.namespace.QName;
 import org.switchyard.ExchangeHandler;
 import org.switchyard.Service;
 import org.switchyard.config.model.Model;
+import org.switchyard.metadata.ServiceInterface;
 
 public interface Activator {
 
     ExchangeHandler init(QName name, Model config);
+    ServiceInterface describe(QName name);
     void start(Service service);
     void stop(Service service);
     void destroy(Service service);

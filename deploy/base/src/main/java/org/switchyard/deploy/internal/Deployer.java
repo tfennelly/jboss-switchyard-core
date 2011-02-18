@@ -24,8 +24,10 @@ package org.switchyard.deploy.internal;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.switchyard.ExchangeHandler;
@@ -43,61 +45,46 @@ import org.switchyard.internal.DefaultEndpointProvider;
 import org.switchyard.internal.DefaultServiceRegistry;
 import org.switchyard.internal.DomainImpl;
 import org.switchyard.internal.transform.BaseTransformerRegistry;
+import org.switchyard.metadata.ServiceInterface;
 import org.switchyard.spi.EndpointProvider;
 import org.switchyard.spi.ServiceRegistry;
 
 /**
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
-public class Deployer {
-    
-    private static final String BEAN_ACTIVATOR_CLASS = 
-        "org.switchyard.component.bean.deploy.BeanComponentActivator";
-    private static final String SOAP_ACTIVATOR_CLASS = 
-        "org.switchyard.component.soap.deploy.SOAPActivator";
+public class Deployer extends AbstractDeployer {
 
-    /**
-     * Root domain property.
-     */
-    public static final String ROOT_DOMAIN = "org.switchyard.domains.root";
-    /**
-     * Endpoint provider class name key.
-     */
-    public static final String ENDPOINT_PROVIDER_CLASS_NAME
-        = "org.switchyard.endpoint.provider.class.name";
-    /**
-     * Registry class name property.
-     */
-    public static final String REGISTRY_CLASS_NAME
-        = "org.switchyard.registry.class.name";
+    private static final String BEAN_ACTIVATOR_CLASS =
+        "org.switchyard.component.bean.deploy.BeanComponentActivator";
+    private static final String SOAP_ACTIVATOR_CLASS =
+        "org.switchyard.component.soap.deploy.SOAPActivator";
 
     private static final Logger LOG = Logger.getLogger(Deployer.class);
 
     private CompositeModel _switchyardConfig;
-    private ServiceDomain _serviceDomain;
-    private Map<String, Activator> _componentActivators = 
+
+    protected Map<String, Activator> _componentActivators =
         new HashMap<String, Activator>();
-    private Map<String, Activator> _gatewayActivators = 
+    protected Map<String, Activator> _gatewayActivators =
         new HashMap<String, Activator>();
 
-    public Deployer() {
-    }
-
-    public void init(InputStream switchyardConfig) {
+    public Deployer(InputStream switchyardConfig) {
         try {
             // parse the config
             _switchyardConfig = (CompositeModel)new ModelResource().pull(switchyardConfig);
-            // create a new domain and load activator instances for lifecycle
-            createDomain();
-            createActivators();
-            // ordered startup lifecycle
-            deployReferenceBindings();
-            deployServices();
-            deployReferences();
-            deployServiceBindings();
         } catch (java.io.IOException ioEx) {
             throw new RuntimeException("Failed to read switchyard config.", ioEx);
         }
+    }
+
+    public void init() {
+        super.init();
+        createActivators();
+        // ordered startup lifecycle
+        deployReferenceBindings();
+        deployServices();
+        deployReferences();
+        deployServiceBindings();
     }
 
     public void destroy() {
@@ -108,30 +95,14 @@ public class Deployer {
         destroyDomain();
     }
 
-    private void createDomain() {
-        String registryClassName = System.getProperty(REGISTRY_CLASS_NAME, DefaultServiceRegistry.class.getName());
-        String endpointProviderClassName = System.getProperty(ENDPOINT_PROVIDER_CLASS_NAME, DefaultEndpointProvider.class.getName());
-
-        try {
-            ServiceRegistry registry = getRegistry(registryClassName);
-            EndpointProvider endpointProvider = getEndpointProvider(endpointProviderClassName);
-            BaseTransformerRegistry transformerRegistry = new BaseTransformerRegistry();
-
-            _serviceDomain = new DomainImpl(ROOT_DOMAIN, registry, endpointProvider, transformerRegistry);
-        } catch (NullPointerException npe) {
-            throw new RuntimeException(npe);
-        }
-
-    }
-
     private void createActivators() {
         try {
             _componentActivators.put(
-                    "bean", 
+                    "bean",
                     (Activator)Class.forName(BEAN_ACTIVATOR_CLASS).newInstance());
-            
+
             _gatewayActivators.put(
-                    "soap", 
+                    "soap",
                     (Activator)Class.forName(SOAP_ACTIVATOR_CLASS).newInstance());
         }
         catch (Exception ex) {
@@ -155,7 +126,8 @@ public class Deployer {
                 LOG.info("Registering service " + service.getName() + 
                         " for component " + component.getImplementation().getType());
                 ExchangeHandler handler = activator.init(service.getQName(), service);
-                Service serviceRef = _serviceDomain.registerService(service.getQName(), handler);
+                ServiceInterface serviceInterface = activator.describe(service.getQName());
+                Service serviceRef = getServiceDomain().registerService(service.getQName(), handler, serviceInterface);
                 activator.start(serviceRef);
             }
         }
@@ -171,7 +143,7 @@ public class Deployer {
             for (ComponentReferenceModel reference : component.getReferences()) {
                 LOG.info("Registering reference " + reference.getName() + 
                         " for component " + component.getImplementation().getType());
-                Service service = _serviceDomain.getService(reference.getQName());
+                Service service = getServiceDomain().getService(reference.getQName());
                 activator.init(reference.getQName(), reference);
                 activator.start(service);
             }
@@ -185,7 +157,7 @@ public class Deployer {
             for (BindingModel binding : service.getBindings()) {
                 LOG.info("Deploying binding " + binding.getType() + " for service " + service.getName());
                 Activator activator = _gatewayActivators.get(binding.getType());
-                Service serviceRef = _serviceDomain.getService(service.getQName());
+                Service serviceRef = getServiceDomain().getService(service.getQName());
                 activator.init(serviceRef.getName(), service);
                 activator.start(serviceRef);
             }
@@ -210,40 +182,6 @@ public class Deployer {
 
     private void destroyDomain() {
 
-    }
-
-    /**
-     * Returns an instance of the ServiceRegistry.
-     * @param registryClass class name of the serviceregistry
-     * @return ServiceRegistry
-     */
-    private static ServiceRegistry getRegistry(final String registryClass) {
-        ServiceLoader<ServiceRegistry> registryServices
-                = ServiceLoader.load(ServiceRegistry.class);
-        for (ServiceRegistry serviceRegistry : registryServices) {
-            if (registryClass.equals(serviceRegistry.getClass().getName())) {
-                return serviceRegistry;
-            }
-        }
-        return null;
-    }
-
-
-    /**
-     * Returns an instance of the EndpointProvider.
-     * @param providerClass class name of the endpointprovider implementation
-     * @return EndpointProvider
-     */
-    private static EndpointProvider
-    getEndpointProvider(final String providerClass) {
-        ServiceLoader<EndpointProvider> providerServices
-                = ServiceLoader.load(EndpointProvider.class);
-        for (EndpointProvider provider : providerServices) {
-            if (providerClass.equals(provider.getClass().getName())) {
-                return provider;
-            }
-        }
-        return null;
     }
 }
 
