@@ -27,6 +27,7 @@ import javax.enterprise.inject.spi.AfterDeploymentValidation;
 import javax.enterprise.inject.spi.BeforeShutdown;
 import javax.enterprise.inject.spi.Extension;
 
+import org.switchyard.deploy.ServiceDomainManager;
 import org.switchyard.deploy.internal.AbstractDeployment;
 import org.switchyard.deploy.internal.Deployment;
 
@@ -50,7 +51,7 @@ public class SwitchYardCDIDeployer implements Extension {
         InputStream swConfigStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(AbstractDeployment.SWITCHYARD_XML);
 
         if (swConfigStream != null) {
-            _deployment = new Deployment(swConfigStream);
+            _deployment = new Deployment(swConfigStream, ServiceDomainManager.createDomain());
             _deployment.init();
             _deployment.start();
         }

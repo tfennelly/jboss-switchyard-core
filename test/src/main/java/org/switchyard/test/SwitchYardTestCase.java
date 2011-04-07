@@ -43,6 +43,7 @@ import org.switchyard.config.model.switchyard.SwitchYardModel;
 import org.switchyard.config.model.switchyard.v1.V1SwitchYardModel;
 import org.switchyard.config.model.transform.TransformModel;
 import org.switchyard.config.util.classpath.ClasspathScanner;
+import org.switchyard.deploy.ServiceDomainManager;
 import org.switchyard.deploy.internal.AbstractDeployment;
 import org.switchyard.deploy.internal.Deployment;
 import org.switchyard.metadata.InOnlyService;
@@ -222,9 +223,9 @@ public abstract class SwitchYardTestCase {
      */
     protected AbstractDeployment createDeployment() throws Exception {
         if (_configModel != null) {
-            return new Deployment(_configModel);
+            return new Deployment(_configModel, ServiceDomainManager.createDomain());
         } else {
-            return new SimpleTestDeployment();
+            return new SimpleTestDeployment(ServiceDomainManager.createDomain());
         }
     }
 

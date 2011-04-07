@@ -19,6 +19,7 @@
 
 package org.switchyard.test;
 
+import org.switchyard.ServiceDomain;
 import org.switchyard.deploy.internal.AbstractDeployment;
 
 /**
@@ -29,6 +30,21 @@ import org.switchyard.deploy.internal.AbstractDeployment;
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
 public class SimpleTestDeployment extends AbstractDeployment {
+
+    /**
+     * Constructor.
+     *
+     * @param serviceDomain The ServiceDomain that the deployment is a member of.
+     */
+    protected SimpleTestDeployment(ServiceDomain serviceDomain) {
+        super(serviceDomain);
+    }
+
+    @Override
+    public void init() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     @Override
     public void start() {
     }

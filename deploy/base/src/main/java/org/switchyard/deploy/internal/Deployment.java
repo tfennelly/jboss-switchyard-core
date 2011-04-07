@@ -29,6 +29,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 import org.switchyard.ExchangeHandler;
+import org.switchyard.ServiceDomain;
 import org.switchyard.ServiceReference;
 import org.switchyard.config.model.ModelResource;
 import org.switchyard.config.model.composite.BindingModel;
@@ -94,8 +95,10 @@ public class Deployment extends AbstractDeployment {
     /**
      * Create a new instance of Deployer from a configuration stream.
      * @param configStream stream containing switchyard config
+     * @param appServiceDomain The ServiceDomain for the application.
      */
-    public Deployment(InputStream configStream) {
+    public Deployment(InputStream configStream, ServiceDomain appServiceDomain) {
+        super(appServiceDomain);
         // parse the config
         try {
             _switchyardConfig = new ModelResource<SwitchYardModel>().pull(configStream);
@@ -107,8 +110,10 @@ public class Deployment extends AbstractDeployment {
     /**
      * Create a new instance of Deployer from a configuration model.
      * @param configModel switchyard config model
+     * @param appServiceDomain The ServiceDomain for the application.
      */
-    public Deployment(SwitchYardModel configModel) {
+    public Deployment(SwitchYardModel configModel, ServiceDomain appServiceDomain) {
+        super(appServiceDomain);
         _switchyardConfig = configModel;
     }
     
@@ -116,7 +121,6 @@ public class Deployment extends AbstractDeployment {
      * Initialize the deployment.
      */
     public void init() {
-        super.init();
         _log.debug("Initializing deployment for application " + _switchyardConfig.getName());
         // create a new domain and load transformer and activator instances for lifecycle
         registerTransformers();

@@ -19,17 +19,7 @@
 
 package org.switchyard.deploy.internal;
 
-import java.util.ServiceLoader;
-
-import javax.xml.namespace.QName;
-
 import org.switchyard.ServiceDomain;
-import org.switchyard.internal.LocalExchangeBus;
-import org.switchyard.internal.DefaultServiceRegistry;
-import org.switchyard.internal.DomainImpl;
-import org.switchyard.internal.transform.BaseTransformerRegistry;
-import org.switchyard.spi.ExchangeBus;
-import org.switchyard.spi.ServiceRegistry;
 import org.switchyard.transform.TransformerRegistryLoader;
 
 /**
@@ -42,20 +32,6 @@ public abstract class AbstractDeployment {
      * Default classpath location for the switchyard configuration.
      */
     public static final String SWITCHYARD_XML = "/META-INF/switchyard.xml";
-    /**
-     * Root domain property.
-     */
-    public static final QName ROOT_DOMAIN = new QName("org.switchyard.domains.root");
-    /**
-     * Endpoint provider class name key.
-     */
-    public static final String ENDPOINT_PROVIDER_CLASS_NAME
-        = "org.switchyard.endpoint.provider.class.name";
-    /**
-     * Registry class name property.
-     */
-    public static final String REGISTRY_CLASS_NAME
-        = "org.switchyard.registry.class.name";
 
     /**
      * Parent deployment.
@@ -66,9 +42,22 @@ public abstract class AbstractDeployment {
      */
     private ServiceDomain _serviceDomain;
     /**
-     * TransformerRegistry Loader class.
+     * Transform registry loaded for the deployment.
      */
     private TransformerRegistryLoader _transformerRegistryLoader;
+
+    /**
+     * Constructor.
+     * @param appServiceDomain The ServiceDomain for the application.
+     */
+    protected AbstractDeployment(ServiceDomain appServiceDomain) {
+        if (appServiceDomain == null) {
+            throw new IllegalArgumentException("null 'appServiceDomain' argument.");
+        }
+        this._serviceDomain = appServiceDomain;
+        _transformerRegistryLoader = new TransformerRegistryLoader(appServiceDomain.getTransformerRegistry());
+        _transformerRegistryLoader.loadOOTBTransforms();
+    }
 
     /**
      * Set the parent deployment.
@@ -83,11 +72,7 @@ public abstract class AbstractDeployment {
     /**
      * Initialise the deployment.
      */
-    public void init() {
-        if (_parentDeployment == null) {
-            createDomain();
-        }
-    }
+    public abstract void init();
 
     /**
      * Start/un-pause the deployment.
@@ -122,56 +107,5 @@ public abstract class AbstractDeployment {
      */
     public TransformerRegistryLoader getTransformerRegistryLoader() {
         return _transformerRegistryLoader;
-    }
-
-    private void createDomain() {
-        String registryClassName = System.getProperty(REGISTRY_CLASS_NAME, DefaultServiceRegistry.class.getName());
-        String endpointProviderClassName = System.getProperty(ENDPOINT_PROVIDER_CLASS_NAME, LocalExchangeBus.class.getName());
-
-        try {
-            ServiceRegistry registry = getRegistry(registryClassName);
-            ExchangeBus endpointProvider = getEndpointProvider(endpointProviderClassName);
-            BaseTransformerRegistry transformerRegistry = new BaseTransformerRegistry();
-
-            _serviceDomain = new DomainImpl(ROOT_DOMAIN, registry, endpointProvider, transformerRegistry);
-
-            _transformerRegistryLoader = new TransformerRegistryLoader(transformerRegistry);
-            _transformerRegistryLoader.loadOOTBTransforms();
-        } catch (NullPointerException npe) {
-            throw new RuntimeException(npe);
-        }
-
-    }
-
-    /**
-     * Returns an instance of the ServiceRegistry.
-     * @param registryClass class name of the serviceregistry
-     * @return ServiceRegistry
-     */
-    private static ServiceRegistry getRegistry(final String registryClass) {
-        ServiceLoader<ServiceRegistry> registryServices
-                = ServiceLoader.load(ServiceRegistry.class);
-        for (ServiceRegistry serviceRegistry : registryServices) {
-            if (registryClass.equals(serviceRegistry.getClass().getName())) {
-                return serviceRegistry;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns an instance of the EndpointProvider.
-     * @param providerClass class name of the endpointprovider implementation
-     * @return EndpointProvider
-     */
-    private static ExchangeBus getEndpointProvider(final String providerClass) {
-        ServiceLoader<ExchangeBus> providerServices
-                = ServiceLoader.load(ExchangeBus.class);
-        for (ExchangeBus provider : providerServices) {
-            if (providerClass.equals(provider.getClass().getName())) {
-                return provider;
-            }
-        }
-        return null;
     }
 }

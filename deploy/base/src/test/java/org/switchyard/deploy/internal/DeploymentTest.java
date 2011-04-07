@@ -27,6 +27,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.switchyard.ServiceDomain;
 import org.switchyard.ServiceReference;
+import org.switchyard.deploy.ServiceDomainManager;
 import org.switchyard.deploy.components.MockActivator;
 import org.switchyard.deploy.components.config.MockBindingModel;
 import org.switchyard.deploy.components.config.MockImplementationModel;
@@ -46,7 +47,7 @@ public class DeploymentTest {
     @Test
     public void testEmptySwitchYardConfiguration() {
         InputStream swConfigStream = getClass().getResourceAsStream("/switchyard-config-empty-01.xml");
-        Deployment deployment = new Deployment(swConfigStream);
+        Deployment deployment = new Deployment(swConfigStream, ServiceDomainManager.createDomain());
 
         deployment.init();
         deployment.destroy();
@@ -55,7 +56,7 @@ public class DeploymentTest {
     @Test
     public void testActivators() {
         InputStream swConfigStream = getClass().getResourceAsStream("/switchyard-config-mock-01.xml");
-        Deployment deployment = new Deployment(swConfigStream);
+        Deployment deployment = new Deployment(swConfigStream, ServiceDomainManager.createDomain());
         deployment.createGatewayActivator("mock", "org.switchyard.deploy.components.MockActivator");
         deployment.createComponentActivator("mock", "org.switchyard.deploy.components.MockActivator");
         deployment.init();
@@ -83,7 +84,7 @@ public class DeploymentTest {
     @Test
     public void test_transform_registration() {
         InputStream swConfigStream = getClass().getResourceAsStream("/switchyard-config-transform-01.xml");
-        Deployment deployment = new Deployment(swConfigStream);
+        Deployment deployment = new Deployment(swConfigStream, ServiceDomainManager.createDomain());
 
         deployment.init();
 
@@ -103,7 +104,7 @@ public class DeploymentTest {
     @Test
     public void interfaceWSDL() {
         InputStream swConfigStream = getClass().getResourceAsStream("/switchyard-config-interface-wsdl-01.xml");
-        Deployment deployment = new Deployment(swConfigStream);
+        Deployment deployment = new Deployment(swConfigStream, ServiceDomainManager.createDomain());
         deployment.createComponentActivator("mock", "org.switchyard.deploy.components.MockActivator");
         deployment.init();
         deployment.start();
