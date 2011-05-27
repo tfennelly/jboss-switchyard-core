@@ -69,4 +69,7 @@
     <!-- InputSource transforms... -->
     <trfm:transform.java from="java:org.xml.sax.InputSource" to="*" class="org.switchyard.transform.ootb.io.InputSourceTransforms" />
 
+    <!-- File transforms... -->
+    <trfm:transform.java from="java:java.io.File" to="*" class="org.switchyard.transform.ootb.io.FileTransforms" />
+
 </transforms>

@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
 import javax.xml.namespace.QName;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FilterInputStream;
@@ -107,6 +108,14 @@ public class OutOfTheBoxTransformersLoadingTest {
         Assert.assertNotNull(registry.getTransformer(qName(InputSource.class), qName(String.class)));
         Assert.assertNotNull(registry.getTransformer(qName(InputSource.class), qName(byte[].class)));
         Assert.assertNotNull(registry.getTransformer(qName(InputSource.class), qName(byte[].class)));
+    }
+
+    @Test
+    public void test_File_Transforms_Loaded() {
+        Assert.assertNotNull(registry.getTransformer(qName(File.class), qName(String.class)));
+        Assert.assertNotNull(registry.getTransformer(qName(File.class), qName(String.class)));
+        Assert.assertNotNull(registry.getTransformer(qName(File.class), qName(byte[].class)));
+        Assert.assertNotNull(registry.getTransformer(qName(File.class), qName(byte[].class)));
     }
 
     private QName qName(Class<?> aClass) {
