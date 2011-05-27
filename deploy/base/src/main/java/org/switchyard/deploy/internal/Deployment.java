@@ -161,8 +161,13 @@ public class Deployment extends AbstractDeployment {
 
         getTransformerRegistryLoader().unregisterTransformers();
     }
-    
-    Activator getActivator(String type) {
+
+    /**
+     * Get the deployment activator for the specified type.
+     * @param type The activator component type.
+     * @return The Activator instance, or null if no activator exists for the specified type.
+     */
+    public Activator getActivator(String type) {
         return _activators.get(type);
     }
     

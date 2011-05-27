@@ -212,6 +212,14 @@ public abstract class SwitchYardTestCase {
     }
 
     /**
+     * Get the deployment instance associated with the test case.
+     * @return The deployment instance associated with the test case.
+     */
+    public AbstractDeployment getDeployment() {
+        return _deployment;
+    }
+
+    /**
      * Get the configuration model driving this test instance, if one exists.
      * <p/>
      * An abstract deployment is created if no configuration model is supplied on construction.
