@@ -9,9 +9,7 @@
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.switchyard</groupId>
   <artifactId>switchyard-core-parent</artifactId>
-  <version>0.3.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>SwitchYard: Core</name>
   <description>SwitchYard Core</description>
@@ -29,10 +27,6 @@
     <module>tools/maven/plugins/switchyard</module>
     <module>deploy/base</module>
     <module>deploy/cdi</module>
-    <module>deploy/jboss-as6/deployer</module>
-    <module>deploy/jboss-as6/build</module>
-    <module>deploy/jboss-as7/extension</module>
-    <module>deploy/jboss-as7/build</module>
     <module>deploy/webapp</module>
     <module>tools/maven/archetypes/application</module>
     <module>tools/forge/common</module>
