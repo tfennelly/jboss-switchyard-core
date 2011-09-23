@@ -34,9 +34,7 @@
 		<relativePath>../../../pom.xml</relativePath>
 	</parent>
 	
-	<groupId>org.switchyard</groupId>
-        <artifactId>switchyard-as6-build</artifactId>
-	<version>${project.parent.version}</version>
+    <artifactId>switchyard-as6-build</artifactId>
 	<packaging>pom</packaging>
 	<name>SwitchYard: AS6 Packager</name>
         <description>SwitchYard AS6 Packager</description>

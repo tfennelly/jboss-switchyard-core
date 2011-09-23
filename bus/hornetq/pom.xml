@@ -29,11 +29,9 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     
-    <groupId>org.switchyard</groupId>
     <artifactId>switchyard-bus-hornetq</artifactId>
     <packaging>jar</packaging>
     <name>SwitchYard: HornetQ Bus</name>
-    <version>${project.parent.version}</version>
     <description>Bus provider using HornetQ Core</description>
     <url>http://switchyard.org/</url>
     

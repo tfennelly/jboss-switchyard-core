@@ -34,12 +34,10 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	
-	<groupId>org.switchyard</groupId>
 	<artifactId>switchyard-deploy</artifactId>
 	
 	<packaging>jar</packaging>
 	<name>SwitchYard: Deploy </name>
-	<version>${project.parent.version}</version>
 	<description>The Deploy SPI.</description>
 	<url>http://switchyard/</url>
 	

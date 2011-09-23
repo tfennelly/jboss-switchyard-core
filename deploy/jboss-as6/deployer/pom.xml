@@ -32,12 +32,11 @@
 		<relativePath>../../../pom.xml</relativePath>
 	</parent>
         <modelVersion>4.0.0</modelVersion>	
-	<groupId>org.switchyard</groupId>
+
 	<artifactId>switchyard-deploy-jboss-as6</artifactId>
 	
 	<packaging>jar</packaging>
 	<name>SwitchYard: JBoss AS6 Deployer</name>
-	<version>${project.parent.version}</version>
 	<description>The JBoss AS6 Deployer Implementation</description>
 	<url>http://switchyard.org/</url>
 	

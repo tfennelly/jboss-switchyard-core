@@ -34,12 +34,10 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	
-	<groupId>org.switchyard</groupId>
 	<artifactId>switchyard-config</artifactId>
 	
 	<packaging>jar</packaging>
 	<name>SwitchYard: Configuration</name>
-	<version>${project.parent.version}</version>
 	<description>The SwitchYard Configuration library.</description>
 	<url>http://switchyard/</url>
 	
